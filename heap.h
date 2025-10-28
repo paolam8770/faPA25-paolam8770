@@ -16,7 +16,7 @@ struct MinHeap {
 
     void push(int idx, int weightArr[]) { // time complexity of o(logn) and space complexity of o(1)
         // TODO: insert index at end of heap, restore order using upheap()
-        if (size >= 64) return;
+        if (size >= 64) return; // check if full
         data[size] = idx;
         upheap(size, weightArr);
         size++;
@@ -25,7 +25,7 @@ struct MinHeap {
     int pop(int weightArr[]) { // time complexity of o(logn) and space complexity of o(1)
         // TODO: remove and return smallest index
         // Replace root with last element, then call downheap()
-        if (size <= 0) return -1;
+        if (size <= 0) return -1; // check if empty
         int x = data[0];
         data[0] = data[size -1];
         size--;
@@ -36,17 +36,31 @@ struct MinHeap {
 
     void upheap(int pos, int weightArr[]) {
         // TODO: swap child upward while smaller than parent
-        while (pos > 0 && weightArr[pos] < weightArr[pos - 1] /2) {
-            swap(data[pos], data[pos - 1]);
-            pos = (pos - 1) /2;
+       int  parent = (pos - 1) / 2; // setting parent
+        while (pos > 0 && weightArr[data[pos]] < weightArr[data[parent]]) { // check
+            swap(data[pos], data[parent]); // perform swap
+            pos = parent;
         }
     }
 
     void downheap(int pos, int weightArr[]) {
         // TODO: swap parent downward while larger than any child
-        while (pos > 0 && weightArr[pos] < weightArr[pos + 1] /2) {
-            swap(data[pos], data[pos + 1]);
-            pos = (pos + 1) /2;
+        while (true){
+            int left = 2*(pos + 1);
+            int right = 2*(pos + 2);
+            int smallest = pos;
+
+            if (left < size && weightArr[data[left]] < weightArr[data[right]]) {
+                smallest = left;
+            }
+            if (right < size && weightArr[data[right]] < weightArr[data[smallest]]) {
+                smallest = right;
+            }
+            if (smallest!= pos) {
+                swap(data[pos], data[smallest]);
+                pos = smallest;
+            }else break;
+
         }
     }
 };
