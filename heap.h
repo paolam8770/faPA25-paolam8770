@@ -16,21 +16,21 @@ struct MinHeap {
 
     void push(int idx, int weightArr[]) { // time complexity of o(logn) and space complexity of o(1)
         // TODO: insert index at end of heap, restore order using upheap()
+        if (size >= 64) return;
+        data[size] = idx;
+        upheap(size, weightArr);
         size++;
-        int x = size - 1;
-        weightArr[x] = idx;
-        upheap(x, weightArr);
     }
 
     int pop(int weightArr[]) { // time complexity of o(logn) and space complexity of o(1)
         // TODO: remove and return smallest index
         // Replace root with last element, then call downheap()
+        if (size <= 0) return -1;
+        int x = data[0];
+        data[0] = data[size -1];
         size--;
-        int x = size - 1;
-        weightArr[x] = -1;
-        downheap(x, weightArr);
-        return weightArr[x];
-
+        if (size > 0) downheap(0, weightArr);
+        return x;
       //  return -1; // placeholder
     }
 
