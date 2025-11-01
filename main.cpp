@@ -132,7 +132,7 @@ void generateCodes(int root, string codes[]) {
     codeStack.push(make_pair(root, "")); // starting w/ empty code
 
     while (!codeStack.empty()) {
-        pair<int, string> code = codeStack.top();
+        auto code = codeStack.top();
         codeStack.pop();
 
         int node = code.first; // curr node index
@@ -140,7 +140,7 @@ void generateCodes(int root, string codes[]) {
 
         // check if node is a leaf
         if (leftArr[node] == -1 && rightArr[node] == -1) {
-            codes[node] = path;
+            codes[ charArr[node] - 'a' ] = path;
         }
         else {
             // push right child first --> left is processed first when popped
