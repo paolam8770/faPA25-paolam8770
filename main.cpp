@@ -1,7 +1,6 @@
 //
 // Created by Manju Muralidharan on 10/19/25.
 //
-#include <algorithm>
 #include <iostream>
 #include <fstream>
 #include <stack>
@@ -94,11 +93,22 @@ int buildEncodingTree(int nextFree) {
     // 1. Create a MinHeap object.
     MinHeap heap; // MinHeap object initialization
     // 2. Push all leaf node indices into the heap.
-    for (int i = 0; i < 26; ++i) {
+    for (int i = 0; i < nextFree; ++i) {
         if (weightArr[i] > 0) {
             heap.push(i,weightArr);
         }
     }
+
+    // to handle 0 or 1 nodes explicitly
+    if (heap.size == 0) {
+        // no letters in input; pass root = -1 to generateCodes()
+        return -1;
+    }
+    if (heap.size == 1) {
+        // single letter becomes root directly
+        return heap.data[0];
+    }
+
     // 3. While the heap size is greater than 1:
     //    - Pop two smallest nodes
     //    - Create a new parent node with combined weight
@@ -107,17 +117,24 @@ int buildEncodingTree(int nextFree) {
     while (heap.size > 1) {
         int l = heap.pop(weightArr); // left child index (smallest weight)
         int r = heap.pop(weightArr); // right child index (2nd smallest weight)
-        int parent = nextFree; // parent node index
+
+        // bound check for parent creation
+        if (nextFree >= MAX_NODES) {
+            cerr << "Error: node limit exceeded.\n";
+            exit(1);
+        }
+
+        int parent = nextFree++; // parent node index
         leftArr[parent] = l;
         rightArr[parent] = r;
         weightArr[parent] = weightArr[l] + weightArr[r]; // combine
         heap.push(parent, weightArr); // push combined node
-        nextFree++; // move to next free
+
     }
 
     // 4. Return the index of the last remaining node (root)
   //  return -1; // placeholder
-    return nextFree -1;
+    return heap.data[0];
 
 }
 
@@ -128,15 +145,28 @@ void generateCodes(int root, string codes[]) {
     // Left edge adds '0', right edge adds '1'.
     // Record code when a leaf node is reached.
 
-    stack<pair<int, string>> codeStack; // init
-    codeStack.push(make_pair(root, "")); // starting w/ empty code
+    // if nothing to encode
+    if (root == -1) return;
+
+    //assign a one-bit code for single node tree
+    if (leftArr[root] == -1 && rightArr[root] == -1) {
+        codes[ charArr[root] - 'a' ] = "0";
+        return;
+    }
+
+    struct NodePath { int node; string path; }; //init
+    stack<NodePath> codeStack;  // starting w/ empty code
+    codeStack.push({root, ""});
+
+   // stack<pair<int, string>> codeStack; // init
+   // codeStack.push(make_pair(root, "")); // starting w/ empty code
 
     while (!codeStack.empty()) {
-        auto code = codeStack.top();
+        NodePath cur = codeStack.top();
         codeStack.pop();
 
-        int node = code.first; // curr node index
-        string path = code.second; // curr bitstring path
+        int node = cur.node; // curr node index
+        const string& path = cur.path; // curr bitstring path
 
         // check if node is a leaf
         if (leftArr[node] == -1 && rightArr[node] == -1) {
@@ -145,10 +175,10 @@ void generateCodes(int root, string codes[]) {
         else {
             // push right child first --> left is processed first when popped
             if (rightArr[node] != -1) {
-                codeStack.push(make_pair(rightArr[node], path + "1"));
+                codeStack.push({ rightArr[node], path + "1" });
             }
             if (leftArr[node] != -1) {
-                codeStack.push(make_pair(leftArr[node], path + "0"));
+                codeStack.push({ leftArr[node],  path + "0" });
             }
         }
 

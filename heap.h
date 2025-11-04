@@ -14,6 +14,8 @@ struct MinHeap {
 
     MinHeap() { size = 0; }
 
+    inline void iswap(int& a, int& b) { int t = a; a = b; b = t; }
+
     void push(int idx, int weightArr[]) { // time complexity of o(logn) and space complexity of o(1)
         // TODO: insert index at end of heap, restore order using upheap()
         if (size >= 64) return; // check if full
@@ -39,7 +41,7 @@ struct MinHeap {
        while (pos>0) {
            int  parent = (pos - 1) / 2; // setting parent
            if (weightArr[data[pos]] < weightArr[data[parent]]) { // check
-               swap(data[pos], data[parent]); // perform swap
+               iswap(data[pos], data[parent]); // perform swap
                pos = parent;
            }else break;
        }
@@ -59,7 +61,7 @@ struct MinHeap {
                 smallest = right;
             }
             if (smallest!= pos) {
-                swap(data[pos], data[smallest]);
+                iswap(data[pos], data[smallest]);
                 pos = smallest;
             }else break;
 
